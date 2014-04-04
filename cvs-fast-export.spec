@@ -1,7 +1,7 @@
 Summary:	Tool to export CVS history into a fast-import stream
 Name:		cvs-fast-export
 Version:	1.10
-Release:	0.1
+Release:	1
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
