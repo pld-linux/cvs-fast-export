@@ -1,11 +1,11 @@
 Summary:	Tool to export CVS history into a fast-import stream
 Name:		cvs-fast-export
-Version:	1.10
+Version:	1.14
 Release:	1
 License:	GPL v2
 Group:		Applications
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
-# Source0-md5:	a3f6c9a620e0b946fdc1d80ba691b13b
+# Source0-md5:	2ae209bc8a37609c717cf957320b1f35
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -25,14 +25,12 @@ includes cvssync, a tool for mirroring masters from remote CVS hosts.
 
 %build
 %{__make} \
-	prefix=%{_prefix} \
 	CC="%{__cc}" \
-	CFLAGS="%{rpmcflags}  -DVERSION=\\\"\$(VERSION)\\\"" \
+	EXTRA_CFLAGS="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
 %{__make} install \
 	prefix=%{_prefix} \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -40,10 +38,10 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS NEWS README TODO
-%attr(755,root,root) %{_bindir}/%{name}
+%attr(755,root,root) %{_bindir}/cvs-fast-export
 %attr(755,root,root) %{_bindir}/cvssync
-%{_mandir}/man1/*.1*
+%{_mandir}/man1/cvs-fast-export.1*
+%{_mandir}/man1/cvssync.1*
