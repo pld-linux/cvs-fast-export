@@ -1,3 +1,7 @@
+#
+# Conditional build:
+%bcond_with	tests		# build without tests
+
 Summary:	Tool to export CVS history into a fast-import stream
 Name:		cvs-fast-export
 Version:	1.14
@@ -28,6 +32,8 @@ includes cvssync, a tool for mirroring masters from remote CVS hosts.
 	CC="%{__cc}" \
 	EXTRA_CFLAGS="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
+
+%{?with_tests:%{__make} check}
 
 %install
 rm -rf $RPM_BUILD_ROOT
