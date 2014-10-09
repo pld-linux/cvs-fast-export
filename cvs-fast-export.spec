@@ -1,15 +1,16 @@
 #
 # Conditional build:
-%bcond_with	tests		# build without tests
+%bcond_with	tests	# perform "make check" (tests/Makefile missing)
 
 Summary:	Tool to export CVS history into a fast-import stream
+Summary(pl.UTF-8):	Narzędzie eksportujące historię CVS w postaci strumienia fast-import
 Name:		cvs-fast-export
-Version:	1.14
+Version:	1.20
 Release:	1
 License:	GPL v2
-Group:		Applications
+Group:		Development/Version Control
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
-# Source0-md5:	2ae209bc8a37609c717cf957320b1f35
+# Source0-md5:	9fcdfeb3a3fa3a23313a579b2fece6ea
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -23,6 +24,18 @@ way; the program tries to emit useful warnings when it can't. The
 program can also produce a visualization of the resulting commit DAG
 in the DOT format handled by the graphviz suite. The package also
 includes cvssync, a tool for mirroring masters from remote CVS hosts.
+
+%description -l pl.UTF-8
+To narzędzie eksportuje historię RCS lub CVS w postaci strumienia
+fast-import. Program analizuje zbiór plików RCS w repozytorium CVS
+(lub na zewnątrz) i, w miarę możliwości, wypuszcza odpowiadającą mu
+historię w postaci strumienia fast-import. Nie wszystkie historie
+można w ten sposób przedstawić - w razie problemów program próbuje
+wypisać przydatne ostrzeżenia. Program potrafi także utworzyć
+wizualizację wynikowego skierowanego grafu acyklicznego (DAG) zmian
+(commitów) w formacie DOT, obsługiwanym przez narzędzia graphviz.
+Pakiet zawiera także narzędzie cvssync do tworzenia kopii lustrzanych
+ze zdalnych serwerów CVS.
 
 %prep
 %setup -q
