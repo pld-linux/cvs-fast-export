@@ -5,12 +5,12 @@
 Summary:	Tool to export CVS history into a fast-import stream
 Summary(pl.UTF-8):	Narzędzie eksportujące historię CVS w postaci strumienia fast-import
 Name:		cvs-fast-export
-Version:	1.20
+Version:	1.21
 Release:	1
 License:	GPL v2
 Group:		Development/Version Control
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
-# Source0-md5:	9fcdfeb3a3fa3a23313a579b2fece6ea
+# Source0-md5:	9831c1f7c7b2ac055c255bbd8922d2a9
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
