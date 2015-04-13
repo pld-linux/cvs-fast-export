@@ -5,12 +5,12 @@
 Summary:	Tool to export CVS history into a fast-import stream
 Summary(pl.UTF-8):	Narzędzie eksportujące historię CVS w postaci strumienia fast-import
 Name:		cvs-fast-export
-Version:	1.21
+Version:	1.30
 Release:	1
 License:	GPL v2
 Group:		Development/Version Control
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
-# Source0-md5:	9831c1f7c7b2ac055c255bbd8922d2a9
+# Source0-md5:	6ae2793b2bc2d567e34bd221409918cb
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -41,7 +41,7 @@ ze zdalnych serwerów CVS.
 %setup -q
 
 %build
-%{__make} \
+%{__make} cvs-fast-export cvssync cvsconvert man \
 	CC="%{__cc}" \
 	EXTRA_CFLAGS="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
@@ -61,6 +61,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS NEWS README TODO
 %attr(755,root,root) %{_bindir}/cvs-fast-export
+%attr(755,root,root) %{_bindir}/cvsconvert
 %attr(755,root,root) %{_bindir}/cvssync
 %{_mandir}/man1/cvs-fast-export.1*
+%{_mandir}/man1/cvsconvert.1*
 %{_mandir}/man1/cvssync.1*
