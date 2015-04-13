@@ -15,6 +15,11 @@ URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+# debugedit is broken:
+# extracting debug info from /home/users/glen/tmp/cvs-fast-export-1.30-root-glen/usr/bin/cvs-fast-export
+# /usr/lib/rpm/bin/debugedit: canonicalization unexpectedly shrank by one character
+%define		_enable_debug_packages	0
+
 %description
 Export an RCS or CVS history as a fast-import stream. This program
 analyzes a collection of RCS files in a CVS repository (or outside of
