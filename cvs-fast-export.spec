@@ -13,6 +13,7 @@ Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
 # Source0-md5:	94d9fbd3374ea4c736c4e9175938cc3c
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
+BuildRequires:	sed >= 4.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # debugedit is broken:
@@ -45,8 +46,10 @@ ze zdalnych serwerów CVS.
 %prep
 %setup -q
 
+%{__sed} -i -e '1s,/usr/bin/env python,/usr/bin/python,' cvsconvert cvsreduce
+
 %build
-%{__make} cvs-fast-export cvssync cvsconvert man \
+%{__make} cvs-fast-export man \
 	CC="%{__cc}" \
 	EXTRA_CFLAGS="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
