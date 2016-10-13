@@ -11,6 +11,7 @@ License:	GPL v2
 Group:		Development/Version Control
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
 # Source0-md5:	7bc950e2853df9736c638226df1bd79e
+Patch0:		hack-disable-cvsignore.patch
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRequires:	sed >= 4.0
@@ -45,6 +46,7 @@ ze zdalnych serwerów CVS.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env python,/usr/bin/python,' cvsconvert cvsreduce
 

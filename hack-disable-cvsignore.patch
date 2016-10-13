@@ -1,0 +1,16 @@
+
+allow disabling .gitignore generation via env
+
+--- cvs-fast-export-1.40/export.c~	2015-11-21 23:16:26.000000000 +0200
++++ cvs-fast-export-1.40/export.c	2016-10-13 21:10:26.557838474 +0300
+@@ -491,8 +491,10 @@
+ 	}
+ 	if (need_ignores) {
+ 	    need_ignores = false;
++	    if (!getenv("DISABLE_GITIGNORE")) {
+ 	    printf("M 100644 inline .gitignore\ndata %zd\n%s\n",
+ 		   sizeof(CVS_IGNORES)-1, CVS_IGNORES);
++	    }
+ 	}
+ 	if (revpairs != NULL && strlen(revpairs) > 0)
+ 	{
