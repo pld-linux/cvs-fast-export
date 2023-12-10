@@ -15,6 +15,9 @@ Patch0:		hack-disable-cvsignore.patch
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRequires:	sed >= 4.0
+%if %{with tests}
+BuildRequires:	cvs
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
