@@ -1,26 +1,21 @@
 #
 # Conditional build:
-%bcond_with	tests	# perform "make check" (tests/Makefile missing)
+%bcond_without	tests	# unit tests
 
 Summary:	Tool to export CVS history into a fast-import stream
 Summary(pl.UTF-8):	Narzędzie eksportujące historię CVS w postaci strumienia fast-import
 Name:		cvs-fast-export
-Version:	1.40
+Version:	1.62
 Release:	1
 License:	GPL v2
 Group:		Development/Version Control
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
-# Source0-md5:	7bc950e2853df9736c638226df1bd79e
+# Source0-md5:	8ed2dac4c7c1763d8351650d0bb2630c
 Patch0:		hack-disable-cvsignore.patch
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRequires:	sed >= 4.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-# debugedit is broken:
-# extracting debug info from /home/users/glen/tmp/cvs-fast-export-1.30-root-glen/usr/bin/cvs-fast-export
-# /usr/lib/rpm/bin/debugedit: canonicalization unexpectedly shrank by one character
-%define		_enable_debug_packages	0
 
 %description
 Export an RCS or CVS history as a fast-import stream. This program
@@ -48,7 +43,7 @@ ze zdalnych serwerów CVS.
 %setup -q
 %patch0 -p1
 
-%{__sed} -i -e '1s,/usr/bin/env python,/usr/bin/python,' cvsconvert cvsreduce
+%{__sed} -i -e '1s,/usr/bin/env python3$,%{__python3},' cvsconvert cvsstrip
 
 %build
 %{__make} cvs-fast-export man \
@@ -56,10 +51,14 @@ ze zdalnych serwerów CVS.
 	EXTRA_CFLAGS="%{rpmcflags}" \
 	LDFLAGS="%{rpmldflags}"
 
-%{?with_tests:%{__make} check}
+%if %{with tests}
+# tests are racy, use -j1
+%{__make} -C tests -j1
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %{__make} install \
 	prefix=%{_prefix} \
 	DESTDIR=$RPM_BUILD_ROOT
@@ -69,7 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS NEWS README TODO
+%doc NEWS.adoc README.adoc TODO.adoc
 %attr(755,root,root) %{_bindir}/cvs-fast-export
 %attr(755,root,root) %{_bindir}/cvsconvert
 %attr(755,root,root) %{_bindir}/cvssync

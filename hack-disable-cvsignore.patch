@@ -3,15 +3,15 @@ allow disabling .gitignore generation via env
 
 Upstream: https://gitlab.com/esr/cvs-fast-export/issues/13
 
---- cvs-fast-export-1.40/export.c~	2015-11-21 23:16:26.000000000 +0200
-+++ cvs-fast-export-1.40/export.c	2016-10-13 21:10:26.557838474 +0300
-@@ -491,8 +491,10 @@
+--- cvs-fast-export-1.62/export.c.orig	2023-12-10 13:22:44.800987007 +0100
++++ cvs-fast-export-1.62/export.c	2023-12-10 13:24:03.297228423 +0100
+@@ -570,8 +570,10 @@ export_commit(git_commit *commit, const
  	}
  	if (need_ignores) {
  	    need_ignores = false;
 +	    if (!getenv("DISABLE_GITIGNORE")) {
- 	    printf("M 100644 inline .gitignore\ndata %zd\n%s\n",
- 		   sizeof(CVS_IGNORES)-1, CVS_IGNORES);
+ 	    printf("M 100644 inline .gitignore\ndata %d\n%s\n",
+ 		   (int)sizeof(CVS_IGNORES)-1, CVS_IGNORES);
 +	    }
  	}
  	if (revpairs != NULL && strlen(revpairs) > 0)
