@@ -1,0 +1,39 @@
+--- cvs-fast-export-1.62/treepack.c.orig	2019-04-26 16:03:34.000000000 +0200
++++ cvs-fast-export-1.62/treepack.c	2023-12-11 20:26:03.515346763 +0100
+@@ -215,6 +215,7 @@ revdir_pack_init(void)
+     frame = frames;
+     nfiles = 0;
+     frames[0].dir = root_dir;
++    frames[0].dirs = xmalloc(0, __func__);
+     frames[0].ndirs = 0;
+     frames[0].hash = hash_init();
+ }
+@@ -257,6 +257,7 @@ revdir_pack_add(const cvs_commit *file,
+ 	    
+ 	    const master_dir *parent = frame++->dir;
+ 	    frame->dir = first_subdir(dir, parent);
++	    frame->dirs = xmalloc(0, __func__);
+ 	    frame->ndirs = 0;
+ 	    frame->hash = hash_init();
+ 	    continue;
+--- cvs-fast-export-1.62/generate.c.orig	2023-12-16 09:25:49.122347160 +0100
++++ cvs-fast-export-1.62/generate.c	2023-12-16 09:25:51.565694258 +0100
+@@ -1058,7 +1058,7 @@ static node_t *generate_setup(generator_
+ 	eb->Gfilename = gen->master_name;
+ 	eb->Gexpand = gen->expand;
+ 	eb->Gabspath = NULL;
+-	Gline(eb) = NULL; Ggap(eb) = Ggapsize(eb) = Glinemax(eb) = 0;
++	Gline(eb) = xmalloc(0, __func__); Ggap(eb) = Ggapsize(eb) = Glinemax(eb) = 0;
+     }
+ 
+     return gen->nodehash.head_node;
+--- cvs-fast-export-1.62/import.c.orig	2023-08-28 19:20:50.000000000 +0200
++++ cvs-fast-export-1.62/import.c	2023-12-16 19:32:48.695246837 +0100
+@@ -322,6 +322,7 @@ void analyze_masters(int argc, const cha
+     striplen = analyzer->striplen;
+ 
+     forest->textsize = forest->filecount = 0;
++    forest->cvsroot = false;
+     progress_begin("Reading file list...", NO_MAX);
+     for (;;)
+     {

@@ -12,6 +12,9 @@ Group:		Development/Version Control
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
 # Source0-md5:	8ed2dac4c7c1763d8351650d0bb2630c
 Patch0:		hack-disable-cvsignore.patch
+Patch1:		%{name}-tsan.patch
+Patch2:		%{name}-asan.patch
+Patch3:		%{name}-ubsan.patch
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRequires:	sed >= 4.0
@@ -45,6 +48,9 @@ ze zdalnych serwerów CVS.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env python3$,%{__python3},' cvsconvert cvsstrip
 
