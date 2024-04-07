@@ -1,67 +1,77 @@
---- cvs-fast-export-1.62/atom.c.orig	2023-12-10 21:33:28.557717340 +0100
-+++ cvs-fast-export-1.62/atom.c	2023-12-10 21:33:33.707747222 +0100
-@@ -99,21 +99,22 @@ atom(const char *string)
-     hash_bucket_t	*b;
-     int			len;
+--- cvs-fast-export-1.66/atom.c.orig	2024-04-07 15:44:05.728144147 +0200
++++ cvs-fast-export-1.66/atom.c	2024-04-07 15:49:33.189703469 +0200
+@@ -100,24 +100,24 @@ const char *atom(const char *string)
+ 	hash_bucket_t *b;
+ 	int len;
  
--    while ((b = *head)) {
--collision:
--	if (b->hash == hash && !strcmp(string, b->string))
--	    return b->string;
--	head = &(b->next);
--    }
- #ifdef THREADS
-     if (threads > 1)
- 	pthread_mutex_lock(&bucket_mutex);
- #endif /* THREADS */
--    if ((b = *head)) {
-+    while ((b = *head)) {
-+collision:
-+	if (b->hash == hash && !strcmp(string, b->string)) {
- #ifdef THREADS
- 	if (threads > 1)
- 	    pthread_mutex_unlock(&bucket_mutex);
- #endif /* THREADS */
-+	    return b->string;
++#ifdef THREADS
++	if (threads > 1) {
++		pthread_mutex_lock(&bucket_mutex);
 +	}
-+	head = &(b->next);
-+    }
-+    if ((b = *head)) {
- 	goto collision;
-     }
++#endif /* THREADS */
+ 	while ((b = *head)) {
+ 	collision:
+ 		if (b->hash == hash && !strcmp(string, b->string)) {
++#ifdef THREADS
++			if (threads > 1) {
++				pthread_mutex_unlock(&bucket_mutex);
++			}
++#endif /* THREADS */
+ 			return b->string;
+ 		}
+ 		head = &(b->next);
+ 	}
+-#ifdef THREADS
+-	if (threads > 1) {
+-		pthread_mutex_lock(&bucket_mutex);
+-	}
+-#endif /* THREADS */
+ 	if ((b = *head)) {
+-#ifdef THREADS
+-		if (threads > 1) {
+-			pthread_mutex_unlock(&bucket_mutex);
+-		}
+-#endif /* THREADS */
+ 		goto collision;
+ 	}
  
-@@ -154,21 +155,22 @@ atom_cvs_number(const cvs_number n)
-     number_bucket_t **head = &number_buckets[bucket];
-     number_bucket_t *b;
+@@ -157,24 +157,24 @@ const cvs_number *atom_cvs_number(const
+ 	number_bucket_t **head = &number_buckets[bucket];
+ 	number_bucket_t *b;
  
--    while ((b = *head)) {
--    collision:
--	if (cvs_number_equal(&b->number, &n))
--	    return &b->number;
--	head = &(b->next);
--    }
- #ifdef THREADS
-     if (threads > 1)
- 	pthread_mutex_lock(&number_bucket_mutex);
- #endif /* THREADS */
--    if ((b = *head)) {
-+    while ((b = *head)) {
-+    collision:
-+	if (cvs_number_equal(&b->number, &n)) {
- #ifdef THREADS
- 	if (threads > 1)
- 	    pthread_mutex_unlock(&number_bucket_mutex);
- #endif /* THREADS */
-+	    return &b->number;
++#ifdef THREADS
++	if (threads > 1) {
++		pthread_mutex_lock(&number_bucket_mutex);
 +	}
-+	head = &(b->next);
-+    }
-+    if ((b = *head)) {
- 	goto collision;
-     }
++#endif /* THREADS */
+ 	while ((b = *head)) {
+ 	collision:
+ 		if (cvs_number_equal(&b->number, &n)) {
++#ifdef THREADS
++			if (threads > 1) {
++				pthread_mutex_unlock(&number_bucket_mutex);
++			}
++#endif /* THREADS */
+ 			return &b->number;
+ 		}
+ 		head = &(b->next);
+ 	}
+-#ifdef THREADS
+-	if (threads > 1) {
+-		pthread_mutex_lock(&number_bucket_mutex);
+-	}
+-#endif /* THREADS */
+ 	if ((b = *head)) {
+-#ifdef THREADS
+-		if (threads > 1) {
+-			pthread_mutex_unlock(&number_bucket_mutex);
+-		}
+-#endif /* THREADS */
+ 		goto collision;
+ 	}
  
---- cvs-fast-export-1.62/revcvs.c.orig	2023-05-13 19:35:07.000000000 +0200
-+++ cvs-fast-export-1.62/revcvs.c	2023-12-10 21:41:28.540502302 +0100
+--- cvs-fast-export-1.66/revcvs.c.orig	2024-04-07 15:44:05.731477463 +0200
++++ cvs-fast-export-1.66/revcvs.c	2024-04-07 15:56:06.944236984 +0200
 @@ -22,6 +22,9 @@
  #endif
  
@@ -70,51 +80,58 @@
 +static pthread_mutex_t root_dir_mutex = PTHREAD_MUTEX_INITIALIZER;
 +#endif
  
- static const char *
- fileop_name(const char *rectified)
-@@ -86,21 +89,22 @@ atom_dir(const char* dirname)
-     dir_bucket **head = &dir_buckets[HASH_VALUE(dirname) % DIR_BUCKETS];
-     dir_bucket *b;
+ static const char *fileop_name(const char *rectified) {
+ 	size_t rlen = strlen(rectified);
+@@ -79,24 +82,24 @@ static const master_dir *atom_dir(const
+ 	dir_bucket **head = &dir_buckets[HASH_VALUE(dirname) % DIR_BUCKETS];
+ 	dir_bucket *b;
  
--    while ((b = *head)) {
--    collision:
--	if (b->dir.name == dirname)
--	    return &(b->dir);
--	head = &(b->next);
--    }
- #ifdef THREADS
-     if (threads > 1)
- 	pthread_mutex_lock(&dir_bucket_mutex);
- #endif /* THREADS */
--    if ((b = *head)) {
-+    while ((b = *head)) {
-+    collision:
-+	if (b->dir.name == dirname) {
- #ifdef THREADS
- 	if (threads > 1)
- 	    pthread_mutex_unlock(&dir_bucket_mutex);
- #endif /* THREADS */
-+	    return &(b->dir);
++#ifdef THREADS
++	if (threads > 1) {
++		pthread_mutex_lock(&dir_bucket_mutex);
 +	}
-+	head = &(b->next);
-+    }
-+    if ((b = *head)) {
- 	goto collision;
-     }
-     b = xmalloc(sizeof(dir_bucket), __func__);
-@@ -800,7 +803,15 @@ cvs_master_digest(cvs_file *cvs, cvs_mas
-     cvs_branch	*cb;
-     cvs_version	*ctrunk = NULL;
++#endif /* THREADS */
+ 	while ((b = *head)) {
+ 	collision:
+ 		if (b->dir.name == dirname) {
++#ifdef THREADS
++			if (threads > 1) {
++				pthread_mutex_unlock(&dir_bucket_mutex);
++			}
++#endif /* THREADS */
+ 			return &(b->dir);
+ 		}
+ 		head = &(b->next);
+ 	}
+-#ifdef THREADS
+-	if (threads > 1) {
+-		pthread_mutex_lock(&dir_bucket_mutex);
+-	}
+-#endif /* THREADS */
+ 	if ((b = *head)) {
+-#ifdef THREADS
+-		if (threads > 1) {
+-			pthread_mutex_unlock(&dir_bucket_mutex);
+-		}
+-#endif /* THREADS */
+ 		goto collision;
+ 	}
+ 	b = xmalloc(sizeof(dir_bucket), __func__);
+@@ -859,9 +862,17 @@ cvs_commit *cvs_master_digest(cvs_file *
+ 	cvs_branch *cb;
+ 	cvs_version *ctrunk = NULL;
  
 +#ifdef THREADS
 +    if (threads > 1)
 +	pthread_mutex_lock(&root_dir_mutex);
 +#endif
-     if (!root_dir) root_dir = atom_dir(atom("\0"));
+ 	if (!root_dir) {
+ 		root_dir = atom_dir(atom("\0"));
+ 	}
 +#ifdef THREADS
 +    if (threads > 1)
 +	pthread_mutex_unlock(&root_dir_mutex);
 +#endif
-     build_rev_master(cvs, master);
+ 	build_rev_master(cvs, master);
  #if CVSDEBUG
-     char buf[CVS_MAX_REV_LEN];
+ 	char buf[CVS_MAX_REV_LEN];

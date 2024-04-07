@@ -1,20 +1,20 @@
---- cvs-fast-export-1.62/export.c.orig	2023-12-10 22:08:38.039921414 +0100
-+++ cvs-fast-export-1.62/export.c	2023-12-11 06:17:08.424656665 +0100
-@@ -208,7 +208,7 @@ static void export_blob(node_t *node,
- 	for (char *cp = cbuf; cp < cbuf + len; cp++)
- 	    if (*cp == ' ')
- 		*cp = '\n';
--	if (strlen(cbuf) >= 2 && cbuf[0] == '!' && cbuf[1] == '\n')
-+	if (strnlen(cbuf, len) >= 2 && cbuf[0] == '!' && cbuf[1] == '\n')
- 	    extralen = 0;
-     }
- 
-@@ -697,7 +697,7 @@ static struct commit_seq *canonicalize(g
- #define is_branchroot_of(x, y) ((x)->head == (y)->head && (x)->isbase)
- #define is_older_than(x, y) (((struct commit_seq *)x)->commit->date < ((struct commit_seq *)y)->commit->date)
- 	/* back up as far as we can */
--	while (!is_parent_of(bp-1, hp) && !is_branchroot_of(bp-1, hp) && !is_older_than(bp-1, hp))
-+	while ((bp > history) && !is_parent_of(bp-1, hp) && !is_branchroot_of(bp-1, hp) && !is_older_than(bp-1, hp))
- 	    bp--;
- 	if (bp < hp) {
- 	    /* shift commits up and put *hp where *bp was */
+--- cvs-fast-export-1.66/export.c.orig	2024-04-07 15:56:24.234143317 +0200
++++ cvs-fast-export-1.66/export.c	2024-04-07 15:59:49.626363945 +0200
+@@ -182,7 +182,7 @@ static void export_blob(node_t *node, vo
+ 				*cp = '\n';
+ 			}
+ 		}
+-		if (strlen(cbuf) >= 2 && cbuf[0] == '!' && cbuf[1] == '\n') {
++		if (strnlen(cbuf, len) >= 2 && cbuf[0] == '!' && cbuf[1] == '\n') {
+ 			extralen = 0;
+ 			cbuf += 2;
+ 			clen -= 2;
+@@ -724,7 +724,7 @@ static struct commit_seq *canonicalize(g
+ 	(((struct commit_seq *)x)->commit->date <                              \
+ 	 ((struct commit_seq *)y)->commit->date)
+ 		/* back up as far as we can */
+-		while (!is_parent_of(bp - 1, hp) &&
++		while ((bp > history) && !is_parent_of(bp - 1, hp) &&
+ 		       !is_branchroot_of(bp - 1, hp) &&
+ 		       !is_older_than(bp - 1, hp)) {
+ 			bp--;
