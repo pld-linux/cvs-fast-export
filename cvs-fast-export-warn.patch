@@ -1,0 +1,51 @@
+--- cvs-fast-export-1.68/lex.l.orig	2024-06-02 02:28:02.000000000 +0200
++++ cvs-fast-export-1.68/lex.l	2024-11-06 21:53:41.007437796 +0100
+@@ -324,10 +324,10 @@ cvstime_t lex_date(const cvs_number *con
+ 		}
+ 		fprintf(stderr, "\n");
+ 	}
+-	if (d < RCS_EPOCH)
++	if (d < (int64_t)RCS_EPOCH)
+ 		fatal_error("%s: (%d) date before RCS epoch: ",
+ 		            cvs->gen.master_name, yyget_lineno(yyscanner));
+-	else if (d >= RCS_OMEGA)
++	else if (d >= (int64_t)RCS_OMEGA)
+ 		fatal_error("%s: (%d) date too far in future: ",
+ 		            cvs->gen.master_name, yyget_lineno(yyscanner));
+ 	return d - RCS_EPOCH;
+--- cvs-fast-export-1.68/export.c.orig	2024-11-06 22:00:05.052023915 +0100
++++ cvs-fast-export-1.68/export.c	2024-11-07 21:39:16.320719897 +0100
+@@ -554,7 +554,7 @@ static void export_commit(git_commit *co
+ 				/* should never happen */
+ 				fatal_error("internal error: child commit "
+ 				            "emitted before parent exists");
+-			} else if (opts->fromtime < commit->parent->date) {
++			} else if (opts->fromtime < (int64_t)commit->parent->date) {
+ 				printf("from :%d\n",
+ 				       (int)markmap[commit->parent->serial]);
+ 			}
+@@ -842,13 +842,13 @@ void export_commits(forest_t *forest, ex
+ 	     hp++) {
+ 		bool report = true;
+ 		if (opts->fromtime > 0) {
+-			if (opts->fromtime >= display_date(hp->commit, mark + 1,
++			if (opts->fromtime >= (int64_t)display_date(hp->commit, mark + 1,
+ 			                                   opts->force_dates)) {
+ 				report = false;
+ 			} else if (!hp->realized) {
+ 				struct commit_seq *lp;
+ 				if (hp->commit->parent != NULL &&
+-				    display_date(
++				    (int64_t)display_date(
+ 				        hp->commit->parent,
+ 				        markmap[hp->commit->parent->serial],
+ 				        opts->force_dates) < opts->fromtime) {
+@@ -870,7 +870,7 @@ void export_commits(forest_t *forest, ex
+ 		export_commit(hp->commit, hp->head->ref_name, report, opts);
+ 		for (t = all_tags; t; t = t->next) {
+ 			if (t->commit == hp->commit &&
+-			    display_date(hp->commit,
++			    (int64_t)display_date(hp->commit,
+ 			                 markmap[hp->commit->serial],
+ 			                 opts->force_dates) > opts->fromtime) {
+ 				printf("reset refs/tags/%s\nfrom :%d\n\n",

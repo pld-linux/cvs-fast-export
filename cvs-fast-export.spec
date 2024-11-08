@@ -5,16 +5,14 @@
 Summary:	Tool to export CVS history into a fast-import stream
 Summary(pl.UTF-8):	Narzędzie eksportujące historię CVS w postaci strumienia fast-import
 Name:		cvs-fast-export
-Version:	1.67
+Version:	1.68
 Release:	1
 License:	GPL v2
 Group:		Development/Version Control
 Source0:	http://www.catb.org/~esr/cvs-fast-export/%{name}-%{version}.tar.gz
-# Source0-md5:	2eac6a0f2e24726ebc7289fff7415f3c
+# Source0-md5:	b92766afa090c8de1f4bd0e5067a7da0
 Patch0:		hack-disable-cvsignore.patch
-Patch1:		%{name}-tsan.patch
-Patch2:		%{name}-asan.patch
-Patch3:		%{name}-ubsan.patch
+Patch1:		%{name}-warn.patch
 URL:		http://www.catb.org/~esr/cvs-fast-export/
 BuildRequires:	asciidoc
 BuildRequires:	sed >= 4.0
@@ -49,15 +47,13 @@ ze zdalnych serwerów CVS.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env python3$,%{__python3},' cvsconvert cvsstrip
 
 %build
 %{__make} cvs-fast-export man \
 	CC="%{__cc}" \
-	EXTRA_CFLAGS="%{rpmcflags}" \
+	EXTRA_CFLAGS="%{rpmcflags} -Wno-error=type-limits" \
 	LDFLAGS="%{rpmldflags}"
 
 %if %{with tests}
